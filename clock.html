@@ -6,7 +6,7 @@
 </head>
 <body>
 	<div class="container">
-		<div class="clock">
+		<div class="clock" id="clock">
 			<div class="clock___center">
 				<div class="hour cc" id="hour"></div>
 				<div class="minute cc" id="minute"></div>
@@ -14,6 +14,65 @@
 			</div>
 		</div>
 	</div>
+		<script>
+		const $clock = document.getElementById('clock');
+		const $second = document.getElementById('second');
+		const $minute = document.getElementById('minute');
+		const $hour = document.getElementById('hour');
+		
+		let degState = {
+			second: 0,
+			minute: 0,
+			hour: 0
+		};
+		
+		function manualClock(degState){
+			degState.second += 6;
+			if(degState.second % 360 === 0){
+				degState.minute += 6;
+				degState.hour += 0.5;
+			}
+		}
+		
+		class timeToDegConverter{
+			static convert(){
+				let currentTime = new Date();
+				return {
+					second: timeToDegConverter.fromSeconds(currentTime.getSeconds()),
+					minute: timeToDegConverter.fromMinutes(currentTime.getMinutes()),
+					hour: timeToDegConverter.fromHours(currentTime.getHours())
+				}
+			}
+			static fromSeconds(s){
+				return s * 6;
+			}
+			static fromMinutes(m){
+				return m * 6;
+			}
+			static fromHours(h){
+				return h * 30;
+			}
+		}
+		
+		function randPos(){
+			let sign = Math.random() > 0.5 ? 1 : -1;
+			return (Math.random() * 5) * sign;
+		}
+			
+		degState = timeToDegConverter.convert();
+
+		setInterval(() => {
+			manualClock(degState);
+			
+			$second.style.transform = `rotate(${degState.second}deg)`;
+			$minute.style.transform = `rotate(${degState.minute}deg)`;
+			$hour.style.transform = `rotate(${degState.hour}deg)`;
+			
+			$clock.style.boxShadow = `${randPos()}px ${randPos()}px 0px black inset`;
+			
+		},1000)
+	</script>
+	
 	<style>
 		
 		.clock{
@@ -28,6 +87,7 @@
 			align-items: center;
 			align-content: center;
 			position: relative;
+			transition: box-shadow 1s ease-in-out;
 		}
 		.container{
 			display: grid;
@@ -65,6 +125,7 @@
 			margin: auto;
 			border-radius: 50px 50px 0 0; 
 			transform-origin: bottom;
+			transition: transform 1s ease-in-out;
 		}
 		
 		.hour{
@@ -86,33 +147,5 @@
 			background: red;
 		}
 	</style>
-	<script>
-		const $second = document.getElementById('second');
-		const $minute = document.getElementById('minute');
-		const $hour = document.getElementById('hour');
-		
-		const degState = {
-			second: 0,
-			minute: 0,
-			hour: 0
-		};
-		
-		setInterval(() => {
-			degState.second += 6;
-			if(degState.second === 360){
-				degState.second = 0;
-				degState.minute += 6;
-				degState.hour += 0.5;
-			}
-			if(degState.minute === 360){
-				degState.minute = 0;
-			}
-			
-			$second.style.transform = `rotate(${degState.second}deg)`;
-			$minute.style.transform = `rotate(${degState.minute}deg)`;
-			$hour.style.transform = `rotate(${degState.hour}deg)`;
-			console.log(degState.hour,degState.minute,degState.second)
-		},1000)
-	</script>
 </body>
 </html>
