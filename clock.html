@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div class="container">
+		<div class="clock">
+			<div class="clock___center">
+				<div class="hour cc" id="hour"></div>
+				<div class="minute cc" id="minute"></div>
+				<div class="second cc" id="second"></div>
+			</div>
+		</div>
+	</div>
+	<style>
+		
+		.clock{
+			width: 50vw;
+			aspect-ratio: 1/1;
+			border-radius: 100%;
+			border: 3px double red;
+			background: url(clock.png);
+			background-size: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			position: relative;
+		}
+		.container{
+			display: grid;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			height: 100vh;
+			
+		}
+		ul{
+			list-style: none;
+		}
+		.numbers{
+			font-size: 1.5rem
+		}
+		
+		.numbers > li:first-child{
+			
+		}
+		
+		.clock___center{
+			width: 3%;
+			aspect-ratio: 1/1;
+			background-color: black;
+			border-radius: 100%;
+			position: relative;
+		}
+		
+		.cc{
+			background: #000;
+			position: absolute;
+			bottom: 25%;
+			left: 0;
+			right: 0;
+			margin: auto;
+			border-radius: 50px 50px 0 0; 
+			transform-origin: bottom;
+		}
+		
+		.hour{
+			height: 900%;
+			width: 50%;
+			position: 4;
+		}
+		
+		.minute{
+			height: 1200%;
+			width: 50%;
+			position: 5;
+		}
+		
+		.second{
+			height: 1500%;
+			width: 11%;
+			position: 6;
+			background: red;
+		}
+	</style>
+	<script>
+		const $second = document.getElementById('second');
+		const $minute = document.getElementById('minute');
+		const $hour = document.getElementById('hour');
+		
+		const degState = {
+			second: 0,
+			minute: 0,
+			hour: 0
+		};
+		
+		setInterval(() => {
+			degState.second += 6;
+			if(degState.second === 360){
+				degState.second = 0;
+				degState.minute += 6;
+				degState.hour += 0.5;
+			}
+			if(degState.minute === 360){
+				degState.minute = 0;
+			}
+			
+			$second.style.transform = `rotate(${degState.second}deg)`;
+			$minute.style.transform = `rotate(${degState.minute}deg)`;
+			$hour.style.transform = `rotate(${degState.hour}deg)`;
+			console.log(degState.hour,degState.minute,degState.second)
+		},1000)
+	</script>
+</body>
+</html>
