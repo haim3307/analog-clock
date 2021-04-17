@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Analog Clock Example - vue js</title>
+	<style>
+
+		.clock{
+			aspect-ratio: 1/1;
+			border-radius: 100%;
+			border: 3px double red;
+			background: url(clock.png);
+			background-size: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			position: relative;
+			transition: box-shadow 1s ease-in-out;
+		}
+
+		.container{
+			display: grid;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			height: 100vh;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+		}
+
+		.clock___center{
+			width: 3%;
+			aspect-ratio: 1/1;
+			background-color: black;
+			border-radius: 100%;
+			position: relative;
+		}
+
+		.cc{
+			background: #000;
+			position: absolute;
+			bottom: 25%;
+			left: 0;
+			right: 0;
+			margin: auto;
+			border-radius: 50px 50px 0 0;
+			transform-origin: bottom;
+		}
+
+		.hour{
+			height: 900%;
+			width: 50%;
+			z-index: 4;
+		}
+
+		.minute{
+			height: 1200%;
+			width: 50%;
+			z-index: 5;
+		}
+
+		.second{
+			height: 1500%;
+			width: 11%;
+			z-index: 6;
+			background: red;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+        <select name="" id="" @change="addClock($event)" style="z-index: 888">
+            <option :value="timezone" v-for="timezone in timezones">
+                {{ timezone }}
+            </option>
+        </select>
+        <div class="container">
+            <analog-clock
+                    v-for="clock in clockList"
+                    :settings="clock"
+                    :timer="timer"
+            ></analog-clock>
+        </div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.11/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="./libs/moment-timezone-with-data.js"></script>
+
+    <script type="text/html" id="clockTemplate">
+        <div>
+            <h2 style="text-align: center">{{ settings.timezone }}</h2>
+            <div class="clock" :style="`box-shadow : ${randPosA}px ${randPosB}px 0px black inset`">
+                <div class="clock___center">
+                    <div class="hour cc" :style="`transform : rotate(${degState.hour}deg)`"></div>
+                    <div class="minute cc" :style="`transform : rotate(${degState.minute}deg)`"></div>
+                    <div class="second cc" :style="`transform : rotate(${degState.second}deg)`"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script>
+		const MODIFIER = 1;
+		const CLOCK_REFRESH_RATE = 1000 / MODIFIER;
+
+		class timeToDegConverter{
+			static convert({ timezone }){
+				let currentTime = moment.tz(timezone);
+				let second = currentTime.seconds();
+				let minute = currentTime.minutes();
+				let hour = currentTime.hours();
+
+                return {
+					second: timeToDegConverter.fromSeconds(second),
+					minute: timeToDegConverter.fromMinutes(minute),
+					hour: timeToDegConverter.fromHours(hour,minute)
+				}
+			}
+			static fromSeconds(s){
+				return s * 6;
+			}
+			
+			static fromMinutes(m,s){
+				if(s){
+					m += s / 60;
+				}
+				return m * 6;
+			}
+			static fromHours(h,m){
+				if(m){
+					h += m / 60;
+				}
+				return h * 30;
+			}
+		}
+
+		let degFromTimeUnit = {
+			second : timeToDegConverter.fromSeconds(1),
+			minute : timeToDegConverter.fromMinutes(1),
+			hour : timeToDegConverter.fromHours(1)
+		};
+
+		let { createApp } = Vue;
+
+        const app = createApp({
+            mounted(){
+                setInterval(() => this.timer++ ,CLOCK_REFRESH_RATE)
+            },
+            data(){
+                return {
+                    timer: 0,
+                    timezones: moment.tz.names(),
+                    clockList: [
+                        {
+                            timezone: 'Asia/Jerusalem'
+                        },
+                    ]
+                }
+            },
+            methods:{
+                addClock($event){
+                    this.clockList.push({
+                        timezone: $event.target.value
+                    })
+                }
+            }
+        });
+        app.component('analog-clock',{
+            name: 'analog-clock',
+            template: '#clockTemplate',
+            props: ['settings','timer'],
+            data(){
+                return {
+                    degState: timeToDegConverter.convert(this.settings),
+                    randPosA: 0,
+                    randPosB: 0,
+                }
+            },
+            methods:{
+                manualClock(){
+                    let { degState } = this;
+                    degState.second += degFromTimeUnit.second;
+
+                    if(
+                        degState.second % (degFromTimeUnit.second * 60) === 0
+                    ){
+                        degState.minute += degFromTimeUnit.minute;
+                        degState.hour += degFromTimeUnit.hour / 60;
+                    }
+                },
+                randPos(){
+                    let sign = Math.random() > 0.5 ? 1 : -1;
+                    return (Math.random() * 25) * sign;
+                }
+            },
+            watch:{
+                degState:{
+                    handler(){
+                        this.randPosA = this.randPos()
+                        this.randPosB = this.randPos()
+                    },
+                    deep:true
+                },
+                timer(){
+                    this.manualClock();
+                }
+            }
+        });
+        const mountedApp = app.mount("#app");
+	</script>
+</body>
+</html>
