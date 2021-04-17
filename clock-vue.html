@@ -20,14 +20,17 @@
 		}
 
 		.container{
-			display: grid;
 			justify-content: center;
 			align-items: center;
 			align-content: center;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 30px;
 		}
-
+        @media(min-width: 765px) {
+            .container{
+                display: grid;
+            }
+        }
 		.clock___center{
 			width: 3%;
 			aspect-ratio: 1/1;
