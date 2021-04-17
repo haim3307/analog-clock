@@ -83,6 +83,7 @@
                     v-for="clock in clockList"
                     :settings="clock"
                     :timer="timer"
+                    mode="synced"
             ></analog-clock>
         </div>
 	</div>
@@ -172,7 +173,7 @@
         app.component('analog-clock',{
             name: 'analog-clock',
             template: '#clockTemplate',
-            props: ['settings','timer'],
+            props: ['settings','timer','mode'],
             data(){
                 return {
                     degState: timeToDegConverter.convert(this.settings),
@@ -206,7 +207,13 @@
                     deep:true
                 },
                 timer(){
-                    this.manualClock();
+                    this.$nextTick( () => {
+                        if (this.mode === 'manual') {
+                            this.manualClock();
+                        } else {
+                            this.degState = timeToDegConverter.convert(this.settings);
+                        }
+                    })
                 }
             }
         });
