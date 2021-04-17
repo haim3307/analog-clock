@@ -24,7 +24,6 @@
 			justify-content: center;
 			align-items: center;
 			align-content: center;
-			height: 100vh;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 30px;
 		}
@@ -70,7 +69,8 @@
 </head>
 <body>
 	<div id="app">
-        <select name="" id="" @change="addClock($event)" style="z-index: 888">
+        <select name="" id="" @change="addClock($event)" style="z-index: 888; width: 100%;">
+            <option value="" disabled selected>Select a timezone to add a clock</option>
             <option :value="timezone" v-for="timezone in timezones">
                 {{ timezone }}
             </option>
