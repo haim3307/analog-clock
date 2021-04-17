@@ -2,7 +2,71 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Analog Clock Example - vanilla js</title>
+	<style>
+
+		.clock{
+			width: 50vw;
+			aspect-ratio: 1/1;
+			border-radius: 100%;
+			border: 3px double red;
+			background: url(clock.png);
+			background-size: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			position: relative;
+			transition: box-shadow 1s ease-in-out;
+		}
+
+		.container{
+			display: grid;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			height: 100vh;
+
+		}
+
+		.clock___center{
+			width: 3%;
+			aspect-ratio: 1/1;
+			background-color: black;
+			border-radius: 100%;
+			position: relative;
+		}
+
+		.cc{
+			background: #000;
+			position: absolute;
+			bottom: 25%;
+			left: 0;
+			right: 0;
+			margin: auto;
+			border-radius: 50px 50px 0 0;
+			transform-origin: bottom;
+		}
+
+		.hour{
+			height: 900%;
+			width: 50%;
+			z-index: 4;
+		}
+
+		.minute{
+			height: 1200%;
+			width: 50%;
+			z-index: 5;
+		}
+
+		.second{
+			height: 1500%;
+			width: 11%;
+			z-index: 6;
+			background: red;
+		}
+	</style>
 </head>
 <body>
 	<div class="container">
@@ -19,34 +83,15 @@
 		const $second = document.getElementById('second');
 		const $minute = document.getElementById('minute');
 		const $hour = document.getElementById('hour');
-		const MODIFER = 1;
-		const CLOCK_REFRESH_RATE = 1000 / MODIFER;
+		const MODIFIER = 1;
+		const CLOCK_REFRESH_RATE = 1000 / MODIFIER;
 		
 		let degState = {
 			second: 0,
 			minute: 0,
 			hour: 0
 		};
-		
-		function manualClock(degState){
-			degState.second += timeToDegConverter.fromSeconds(1);
 
-			if(
-				degState.second % timeToDegConverter.fromSeconds(60) === 0
-			){
-				degState.minute += timeToDegConverter.fromMinutes(1);
-				degState.hour += timeToDegConverter.fromHours(1) / 60;
-			}
-		}
-		
-		function renderClock(degState){
-			$second.style.transform = `rotate(${degState.second}deg)`;
-			$minute.style.transform = `rotate(${degState.minute}deg)`;
-			$hour.style.transform = `rotate(${degState.hour}deg)`;
-			
-			$clock.style.boxShadow = `${randPos()}px ${randPos()}px 0px black inset`;
-		}
-		
 		class timeToDegConverter{
 			static convert(){
 				let currentTime = new Date();
@@ -78,84 +123,52 @@
 			}
 		}
 		
-		function randPos(){
-			let sign = Math.random() > 0.5 ? 1 : -1;
-			return (Math.random() * 5) * sign;
-		}
-			
-		degState = timeToDegConverter.convert();
+				
+		let degFromTimeUnit = {
+			second : timeToDegConverter.fromSeconds(1),
+			minute : timeToDegConverter.fromMinutes(1),
+			hour : timeToDegConverter.fromHours(1)
+		};
+		
+		class AnalogClock{
+			manualClock(degState){
+				degState.second += degFromTimeUnit.second;
 
-		setInterval(() => {
-			manualClock(degState);
+				if(
+					degState.second % (degFromTimeUnit.second * 60) === 0
+				){
+					degState.minute += degFromTimeUnit.minute;
+					degState.hour += degFromTimeUnit.hour / 60;
+				}
+			}
 			
-			renderClock(degState);
+			render(degState){
+				$second.style.transform = `rotate(${degState.second}deg)`;
+				$minute.style.transform = `rotate(${degState.minute}deg)`;
+				$hour.style.transform = `rotate(${degState.hour}deg)`;
+
+				$clock.style.boxShadow = `
+					${this.randPos()}px ${this.randPos()}px 0px black inset
+				`;
+			}
 			
-		},CLOCK_REFRESH_RATE)
+			init(){
+				degState = timeToDegConverter.convert();
+
+				setInterval(() => {
+					this.manualClock(degState);
+
+					this.render(degState);
+
+				},CLOCK_REFRESH_RATE)
+			}
+			randPos(){
+				let sign = Math.random() > 0.5 ? 1 : -1;
+				return (Math.random() * 5) * sign;
+			}
+		}
+		
+		new AnalogClock().init();
 	</script>
-	
-	<style>
-		
-		.clock{
-			width: 50vw;
-			aspect-ratio: 1/1;
-			border-radius: 100%;
-			border: 3px double red;
-			background: url(clock.png);
-			background-size: 100%;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			align-content: center;
-			position: relative;
-			transition: box-shadow 1s ease-in-out;
-		}
-		
-		.container{
-			display: grid;
-			justify-content: center;
-			align-items: center;
-			align-content: center;
-			height: 100vh;
-			
-		}
-
-		.clock___center{
-			width: 3%;
-			aspect-ratio: 1/1;
-			background-color: black;
-			border-radius: 100%;
-			position: relative;
-		}
-		
-		.cc{
-			background: #000;
-			position: absolute;
-			bottom: 25%;
-			left: 0;
-			right: 0;
-			margin: auto;
-			border-radius: 50px 50px 0 0; 
-			transform-origin: bottom;
-		}
-		
-		.hour{
-			height: 900%;
-			width: 50%;
-			position: 4;
-		}
-		
-		.minute{
-			height: 1200%;
-			width: 50%;
-			position: 5;
-		}
-		
-		.second{
-			height: 1500%;
-			width: 11%;
-			position: 6;
-			background: red;
-		}
-	</style>
 </body>
 </html>
